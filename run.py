@@ -9,7 +9,7 @@ from handlers import router
 from database.database import HelpBase
 
 async def ante_scr():
-    print('Все заебись')
+    print('Все шикарно')
 
 
 
