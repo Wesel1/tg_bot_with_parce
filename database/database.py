@@ -1,44 +1,73 @@
 import sqlite3
 
-class HelpBase:
+class MyBase:
     def __init__(self, path: str):
-        self.path = path
-        self.create_base()
+        self.connect = sqlite3.connect(path)
+        self.connect.row_factory = sqlite3.Row
+        self.cursor = self.connect.cursor()
 
-    def create_base(self):
-         with sqlite3.connect(self.path) as m:
-             cursor = m.cursor()
-             cursor.execute("CREATE TABLE IF NOT EXISTS catalogue (id INTEGER PRIMARY KEY, status TEXT, data_from_site TEXT);")
-             cursor.execute("PRAGMA journal_mode=WAL")
-
-
-    def save(self, status: str, text: str):
-        with sqlite3.connect(self.path) as a:
-            cursor = a.cursor()
-            cursor.execute(
-                "INSERT INTO catalogue (id, status, data_from_site) VALUES (1, ?, ?) "
-                "ON CONFLICT(id) DO UPDATE SET "
-                "status = excluded.status, "
-                "data_from_site = excluded.data_from_site",
-                (status, text)
+    def create_tables(self):
+         cur = self.cursor
+         cur.execute("""
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL UNIQUE,
+                url TEXT
             )
-
-    def find(self, status):
-        with sqlite3.connect(self.path) as b:
-            cursor = b.cursor()
-            cursor.execute(
-                "SELECT status, data_from_site FROM catalogue WHERE status = ?", (f"{status}",)
+         """)
+         cur.execute("PRAGMA journal_mode=WAL")
+         cur.execute("""
+            CREATE TABLE IF NOT EXISTS chapters(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                book_id INTEGER,
+                volume INTEGER,
+                chapter INTEGER,
+                rule INTEGER,
+                text TEXT,
+                FOREIGN KEY(book_id) REFERENCES books(id)
             )
-            return cursor.fetchone()
+         """)
+         self.connect.commit()
 
 
-    def delete(self):
-        with sqlite3.connect(self.path) as c:
-            cursor = c.cursor()
-            cursor.execute("DELETE FROM catalogue WHERE id = 1")
+    def add_book(self, title: str, url: str) -> int:
+        cur = self.cursor
+        cur.execute(
+            "INSERT INTO books (title, url) VALUES (?, ?) ",
+            (title, url)
+        )
+        self.connect.commit()
+        return cur.lastrowid
+
+    def add_chapter(self, book_id: int, volume: int, chapter: int, rule: int, text: int):
+        cur = self.cursor
+        cur.execute("""
+            INSERT INTO chapters (book_id, volume, chapter, rule, text)
+            VALUES (?, ?, ?, ?, ?)
+        """, (book_id, volume, chapter, rule, text)
+                    )
+        self.connect.commit()
+
+    def get_book(self, title: str):
+        cur = self.cursor
+        cur.execute(
+            "SELECT * FROM books WHERE title = ?",
+            (title,)
+        )
+        return cur.fetchone()
+
+    def get_chapters_by_book_id(self, book_id: int):
+        cur = self.cursor
+        cur.execute(
+            "SELECT * FROM chapters WHERE book_id = ?",
+            (book_id,)
+        )
+        return cur.fetchall()
+
+
+    def conn_close(self):
+        self.cursor.close()
+        self.connect.close()
 
 if __name__ == '__main__':
-    db = HelpBase('help.db')
-    db.delete()
-    db.save('parce_done', 'Ну допустим')
-    print(db.find('parce_done'))
+    db = MyBase('help.sql')

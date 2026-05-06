@@ -5,12 +5,18 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile
 from aiogram.fsm.state import State, StatesGroup
 
+import app.keyboard as kb
+
 from parcer_chance_1 import main_data_proc_par
 from AI_chance_1 import ai_ask
-from database.database import HelpBase
+from database.database import MyBase
 
 router = Router()
-db = HelpBase('help.db')
+
+class NewNovelStates(StatesGroup):
+    title: str
+    url: str
+
 
 class NovelStates(StatesGroup):
     volume = State()
@@ -18,9 +24,9 @@ class NovelStates(StatesGroup):
 
 @router.message(Command('start'))
 async def start(message: types.Message):
-    await message.answer("Привет! 🚀")
+    await message.answer("Привет! 🚀", reply_markup=kb.start)
 
-@router.message(F.text.lower() == 'погнали')
+@router.message(F.text.lower() == 'Начать')
 async def dialogue_start(message: types.Message, state: FSMContext):
     await state.set_state(NovelStates.volume)
     await message.answer('Напишите номер тома')
@@ -39,10 +45,10 @@ async def process_chapter(message: types.Message, state: FSMContext):
 
     await message.answer('Пока что все шикарно')
 
-    await main_data_proc_par(data['volume'], data['chapter'])
-    await ai_ask()
+    text = await main_data_proc_par(data['volume'], data['chapter'])
+    doc = await ai_ask(text)
 
-    document = BufferedInputFile(db.find('ai_done')[1].encode('utf-8'), filename="report.md")
-    await message.answer_document(document, caption='Вот ваша глава')
+    document = BufferedInputFile(doc.encode('utf-8'), filename=f"Глава_{data['chapter']}.md")
+    await message.answer_document(document, caption=f'Вот глава {data['chapter']}')
 
     await state.clear()

@@ -2,23 +2,24 @@ import os
 import asyncio
 from dotenv import load_dotenv
 
-from aiogram import Bot, Dispatcher
-# from aiogram.fsm.storage.memory import MemoryStorage
+import redis.asyncio as aioredis
 
-from handlers import router
-from database.database import HelpBase
+from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.redis import RedisStorage
+
+from app.handlers import router
 
 async def ante_scr():
     print('Все шикарно')
 
 
-
 async def main() -> None:
     load_dotenv()
+    redis = await aioredis.from_url('redis://localhost:6379/0')
     bot = Bot(token=os.environ.get('TOKEN_BOT'))
-    # storage = MemoryStorage()
-    dp = Dispatcher()
+    dp = Dispatcher(storage=RedisStorage(redis))
     dp.include_router(router)
+
     await ante_scr()
 
     await dp.start_polling(bot)
