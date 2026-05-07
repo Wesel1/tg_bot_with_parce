@@ -71,3 +71,4 @@ class MyBase:
 
 if __name__ == '__main__':
     db = MyBase('help.sql')
+    db.conn_close()
