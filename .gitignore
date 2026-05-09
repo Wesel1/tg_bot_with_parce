@@ -29,6 +29,7 @@ dmypy.json
 *.sqlite
 *.sqlite3
 *.db
+*.sql
 
 .idea/
 .vscode/

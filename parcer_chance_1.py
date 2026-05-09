@@ -4,16 +4,20 @@ from bs4 import BeautifulSoup as bs
 
 
 
-async def take_data(volume: int, chapter: int, number: int = 7413, name: str = "release-that-witch-novel") -> str:
-    url = f"https://ranobelib.me/ru/{number}--{name}/read/v{volume}/c{chapter}"
+async def take_data(base_url: str, volume: int, chapter: int) -> str:
+    url = base_url + '/read/'+ f"v{volume}/c{chapter}"
+    print(base_url)
+    print(url)
     # https://ranobelib.me/ru/262500--megami-isekai-tensei-nani-ni-naritai-desu-ka-ore-yusha-no-rokkotsu-de/read/v1/c0
     async with async_playwright() as p:
-        browser = await p.chromium.launch()
+        browser = await p.chromium.launch(
+            headless=False
+        )
 
         async with await browser.new_context() as context:
             page = await context.new_page()
-            response = await page.goto(url)
-            await page.wait_for_load_state("networkidle")
+            response = await page.goto(url=url, wait_until='load', timeout=100000)
+            # await page.wait_for_load_state("networkidle")
             html = await page.content()
 
         await browser.close()
@@ -36,14 +40,14 @@ def data_processing(html: str) -> str:
     return result
 
 
-async def main_data_proc_par(volume: int, chapter: int) -> str:
-    html = await take_data(volume, chapter)
+async def main_data_proc_par(url: str, volume: int, chapter: int) -> str:
+    html = await take_data(url, volume, chapter)
     print(data_processing(html))
     return data_processing(html)
 
 
 if __name__ == '__main__':
-    asyncio.run(main_data_proc_par(1, 1000))
+    asyncio.run(main_data_proc_par(url='https://ranobelib.me/ru/7413--release-that-witch-novel',volume=1, chapter=1000))
 
 
 

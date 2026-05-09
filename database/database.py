@@ -12,7 +12,7 @@ class MyBase:
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL UNIQUE,
-                url TEXT
+                url TEXT NOT NULL UNIQUE
             )
          """)
          cur.execute("PRAGMA journal_mode=WAL")
@@ -20,8 +20,8 @@ class MyBase:
             CREATE TABLE IF NOT EXISTS chapters(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 book_id INTEGER,
-                volume INTEGER,
-                chapter INTEGER,
+                volume INTEGER UNIQUE,
+                chapter INTEGER UNIQUE,
                 rule INTEGER,
                 text TEXT,
                 FOREIGN KEY(book_id) REFERENCES books(id)
@@ -39,7 +39,7 @@ class MyBase:
         self.connect.commit()
         return cur.lastrowid
 
-    def add_chapter(self, book_id: int, volume: int, chapter: int, rule: int, text: int):
+    def add_chapter(self, book_id: int, volume: int, chapter: int, text: str, rule: int = None) -> None:
         cur = self.cursor
         cur.execute("""
             INSERT INTO chapters (book_id, volume, chapter, rule, text)
@@ -48,27 +48,28 @@ class MyBase:
                     )
         self.connect.commit()
 
-    def get_book(self, title: str):
+    def get_book(self, title: str) -> int:
         cur = self.cursor
         cur.execute(
             "SELECT * FROM books WHERE title = ?",
             (title,)
         )
-        return cur.fetchone()
+        return cur.fetchone()['id']
 
-    def get_chapters_by_book_id(self, book_id: int):
+    def get_chapters_by_book_id(self, book_id: int, volume: int, chapter: int) -> str:
         cur = self.cursor
         cur.execute(
-            "SELECT * FROM chapters WHERE book_id = ?",
-            (book_id,)
+            "SELECT * FROM chapters WHERE book_id = ? AND volume = ? AND chapter = ?",
+            (book_id, volume, chapter)
         )
-        return cur.fetchall()
-
+        return cur.fetchone()['text']
 
     def conn_close(self):
         self.cursor.close()
         self.connect.close()
 
 if __name__ == '__main__':
-    db = MyBase('help.sql')
+    db = MyBase('../data.sql')
+    id = db.get_book(title='освободите эту ведьму')
+    print(db.get_chapters_by_book_id(book_id=id, volume=1, chapter=1000))
     db.conn_close()

@@ -7,11 +7,13 @@ import redis.asyncio as aioredis
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 
-from app.handlers import router
+from app.handlers import router, db
 
 async def ante_scr():
     print('Все шикарно')
 
+async def post_scr():
+    db.conn_close()
 
 async def main() -> None:
     load_dotenv()
