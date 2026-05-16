@@ -16,7 +16,7 @@ async def take_data(base_url: str, volume: int, chapter: int) -> str:
 
         async with await browser.new_context() as context:
             page = await context.new_page()
-            response = await page.goto(url=url, wait_until='load', timeout=100000)
+            response = await page.goto(url=url, wait_until='networkidle', timeout=100000)
             # await page.wait_for_load_state("networkidle")
             html = await page.content()
 
@@ -51,6 +51,6 @@ if __name__ == '__main__':
 
 
 
-
+# api.cdnlibs.org
 # https://ranobelib.me/ru/20818--lord-of-the-mysteries/read/v2/c311?bid=18695
 # https://ranobelib.me/ru/book/20818--lord-of-the-mysteries?section=chapters

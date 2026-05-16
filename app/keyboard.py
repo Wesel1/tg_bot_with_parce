@@ -1,7 +1,7 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 start = ReplyKeyboardMarkup(keyboard=[
-        [KeyboardButton(text='Начать')]
+    [KeyboardButton(text='Начать')]
     ],
     resize_keyboard=True
 )

@@ -17,6 +17,7 @@ async def post_scr():
 
 async def main() -> None:
     load_dotenv()
+
     redis = await aioredis.from_url('redis://localhost:6379/0')
     bot = Bot(token=os.environ.get('TOKEN_BOT'))
     dp = Dispatcher(storage=RedisStorage(redis))
@@ -25,6 +26,8 @@ async def main() -> None:
     await ante_scr()
 
     await dp.start_polling(bot)
+    print('Закрыли бд')
+    await post_scr()
 
 
 if __name__ == '__main__':

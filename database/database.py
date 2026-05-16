@@ -48,21 +48,21 @@ class MyBase:
                     )
         self.connect.commit()
 
-    def get_book(self, title: str) -> int:
+    def get_book(self, title: str):
         cur = self.cursor
         cur.execute(
-            "SELECT * FROM books WHERE title = ?",
+            "SELECT id, url FROM books WHERE title = ?",
             (title,)
         )
-        return cur.fetchone()['id']
+        return cur.fetchone()
 
-    def get_chapters_by_book_id(self, book_id: int, volume: int, chapter: int) -> str:
+    def get_chapters_by_book_id(self, book_id: int, volume: int, chapter: int):
         cur = self.cursor
         cur.execute(
             "SELECT * FROM chapters WHERE book_id = ? AND volume = ? AND chapter = ?",
             (book_id, volume, chapter)
         )
-        return cur.fetchone()['text']
+        return cur.fetchone()
 
     def conn_close(self):
         self.cursor.close()
@@ -70,6 +70,9 @@ class MyBase:
 
 if __name__ == '__main__':
     db = MyBase('../data.sql')
-    id = db.get_book(title='освободите эту ведьму')
-    print(db.get_chapters_by_book_id(book_id=id, volume=1, chapter=1000))
+    book = db.get_book(title='освободите эту ведьму')
+    # print(f"{book['id']}, {book['title']}, {book['url']}")
+    book_id, url = book
+    print(book_id, url)
+    # print(db.get_chapters_by_book_id(book_id=book['id'], volume=1, chapter=1000))
     db.conn_close()
