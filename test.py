@@ -41,8 +41,6 @@
 from pydantic import BaseModel
 from typing import Optional
 
-from app.handlers import build_chapter
-
 
 class Book(BaseModel):
     id: Optional[int] = None
@@ -60,7 +58,6 @@ print(tuple(a.model_dump().items()))
 r = 'cont:qwehd:kljdsf:1209'
 
 print(r.startswith('cont'))
-
 
 
 

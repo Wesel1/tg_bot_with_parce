@@ -2,34 +2,35 @@ import os
 import asyncio
 from dotenv import load_dotenv
 
-import redis.asyncio as aioredis
-
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.redis import RedisStorage
 
-from app.handlers import router, db
+from app.handlers import router
+from database.db_instance import db
+
 
 async def ante_scr():
-    print('Все шикарно')
+    print("Все шикарно")
+    await db.setup()
+    await db.create_tables()
+
 
 async def post_scr():
-    db.conn_close()
+    await db.close()
+
 
 async def main() -> None:
     load_dotenv()
 
-    redis = await aioredis.from_url('redis://localhost:6379/0')
-    bot = Bot(token=os.environ.get('TOKEN_BOT'))
-    dp = Dispatcher(storage=RedisStorage(redis))
+    bot = Bot(token=os.environ.get("TOKEN_BOT"))
+    dp = Dispatcher()
     dp.include_router(router)
 
     await ante_scr()
 
     await dp.start_polling(bot)
-    print('Закрыли бд')
+    print("Закрыли бд")
     await post_scr()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
-
