@@ -1,7 +1,8 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import (
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+)
 
-start = ReplyKeyboardMarkup(keyboard=[
-        [KeyboardButton(text='Начать')]
-    ],
-    resize_keyboard=True
+start = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Начать")]], resize_keyboard=True
 )
