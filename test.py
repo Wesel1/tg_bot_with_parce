@@ -38,26 +38,28 @@
 #
 # print(response.text)
 
-from pydantic import BaseModel
-from typing import Optional
+# from pydantic import BaseModel
+# from typing import Optional
+#
+#
+# class Book(BaseModel):
+#     id: Optional[int] = None
+#     pipidastr: str
+#     hurl: Optional[str] = None
+#     Vanya: int
+#     hyi: int
+#     text: str = None
+#
+# a = Book.model_validate({'pipidastr': 'Deploy', 'Vanya': 10, 'hyi': 10})
+#
+# print(*[i[1] for i in [*a]])
+# print(tuple(a.model_dump().items()))
+#
+# r = 'cont:qwehd:kljdsf:1209'
+#
+# print(r.startswith('cont'))
+from database.database_sqlalch import Book
 
+book = Book(title="Witch", url="test")
 
-class Book(BaseModel):
-    id: Optional[int] = None
-    pipidastr: str
-    hurl: Optional[str] = None
-    Vanya: int
-    hyi: int
-    text: str = None
-
-a = Book.model_validate({'pipidastr': 'Deploy', 'Vanya': 10, 'hyi': 10})
-
-print(*[i[1] for i in [*a]])
-print(tuple(a.model_dump().items()))
-
-r = 'cont:qwehd:kljdsf:1209'
-
-print(r.startswith('cont'))
-
-
-
+print(book.id)

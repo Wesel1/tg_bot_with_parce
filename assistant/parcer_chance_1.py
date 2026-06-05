@@ -14,7 +14,7 @@ async def take_data(base_url: str, volume: int, chapter: int) -> str:
         async with await browser.new_context() as context:
             page = await context.new_page()
             response = await page.goto(
-                url=url, wait_until="networkidle", timeout=100000
+                url=url, wait_until="networkidle", timeout=10000000
             )
             html = await page.content()
 

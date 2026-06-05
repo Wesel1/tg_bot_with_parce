@@ -5,17 +5,17 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 
 from app.handlers import router
-from database.db_instance import db
+from database.session import engine
+from database.session import create_db
 
 
 async def ante_scr():
     print("Все шикарно")
-    await db.setup()
-    await db.create_tables()
+    await create_db()
 
 
 async def post_scr():
-    await db.close()
+    await engine.dispose()
 
 
 async def main() -> None:
@@ -26,10 +26,9 @@ async def main() -> None:
     dp.include_router(router)
 
     await ante_scr()
-
     await dp.start_polling(bot)
-    print("Закрыли бд")
     await post_scr()
+    print("Закрыли engine")
 
 
 if __name__ == "__main__":
